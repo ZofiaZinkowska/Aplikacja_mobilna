@@ -10,11 +10,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Mail',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.orange
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'MailCode'),
     );
   }
 }
@@ -78,18 +78,22 @@ class _MyHomePageState extends State<MyHomePage> {
                   children: <Widget>[
                     Padding(
                       padding: const EdgeInsets.only(right: 8.0),
-                      child: OutlineButton(
+                      child: OutlinedButton(
                         onPressed: () => print('pressed'),
                         child: const Text('Attachment 1'),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30.0)),
+                        style: OutlinedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30.0)),
+                        )
                       ),
                     ),
-                    OutlineButton(
+                    OutlinedButton(
                       onPressed: () => print('pressed'),
                       child: const Text('Attachment 1'),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30.0)),
+                      style: OutlinedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30.0)),
+                      )
                     ),
                   ],
                 )
