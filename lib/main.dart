@@ -1,4 +1,7 @@
+import 'package:aplikacja__mobilna/connect.dart';
 import 'package:flutter/material.dart';
+
+import 'messages.dart';
 
 void main() => runApp(MyApp());
 
@@ -48,6 +51,9 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
 
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -58,7 +64,8 @@ class _MyHomePageState extends State<MyHomePage> {
     // than having to individually change instances of widgets.
 
     final emailField = TextField(
-      obscureText: true,
+      controller: emailController,
+      obscureText: false,
       style: style,
       decoration: InputDecoration(
           contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
@@ -68,6 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
 
     final passwordField = TextField(
+      controller: passwordController,
       obscureText: true,
       style: style,
       decoration: InputDecoration(
@@ -84,7 +92,15 @@ class _MyHomePageState extends State<MyHomePage> {
       child: MaterialButton(
         minWidth: MediaQuery.of(context).size.width,
         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => ConnectPage(
+                        email: emailController.text,
+                        password: passwordController.text,
+                      )));
+        },
         child: Text("Login",
             textAlign: TextAlign.center,
             style: style.copyWith(
@@ -93,7 +109,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
 
     return Scaffold(
-      body: SingleChildScrollView(
+        body: SingleChildScrollView(
       child: Center(
         child: Container(
           color: Colors.white,
@@ -104,11 +120,11 @@ class _MyHomePageState extends State<MyHomePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 SizedBox(
-                  height: 155.0,
-                  child: Text("E-mail",
-                textAlign: TextAlign.center,
-                style: style.copyWith(
-                color: Colors.black, fontWeight: FontWeight.bold)),
+                  height: 100.0,
+                  child: Text("Login panel",
+                      textAlign: TextAlign.center,
+                      style: style.copyWith(
+                          color: Colors.black, fontWeight: FontWeight.bold)),
                 ),
                 SizedBox(height: 45.0),
                 emailField,
@@ -126,7 +142,6 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
       ),
-        )
-    );
+    ));
   }
 }
