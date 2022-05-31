@@ -30,7 +30,7 @@ class _ComposePageState extends State<ComposePage> {
 
     final topicField = TextField(
       controller: topicController,
-      obscureText: true,
+      obscureText: false,
       style: style,
       decoration: InputDecoration(
           contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
@@ -41,7 +41,7 @@ class _ComposePageState extends State<ComposePage> {
 
     final messageField = TextField(
       controller: messageController,
-      obscureText: true,
+      obscureText: false,
       style: style,
       decoration: InputDecoration(
           contentPadding: EdgeInsets.fromLTRB(20.0, 80.0, 20.0, 80.0),

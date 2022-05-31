@@ -13,9 +13,6 @@ class ConnectPage extends StatefulWidget {
   State<ConnectPage> createState() => _ConnectPageState();
 }
 
-typedef ConnectedCallback = void Function(Mailbox);
-typedef ErrorCallback = void Function(String);
-
 class _ConnectPageState extends State<ConnectPage> {
   @override
   Widget build(BuildContext context) {
@@ -54,17 +51,20 @@ class _ConnectPageState extends State<ConnectPage> {
   Future<List<MimeMessage>> connect(String email, String password) async {
     final config = await Discover.discover(widget.email!);
 
-    // TODO: Show error when config is null (could not be detected)
+    // TODO: Show error when config is null (could not be detected),
+    // or email and/or password are missing
     final account =
         MailAccount.fromDiscoveredSettings(email, email, password, config!);
 
     // TODO: Disable logging
     final client = MailClient(account, isLogEnabled: true);
 
+    // TODO: try-catch to handle authorization fail
     await client.connect();
     await client.selectInbox();
 
-    final messages = await client.fetchMessages(count: 10);
+    final messages = await client.fetchMessages(
+        count: 10, fetchPreference: FetchPreference.full);
 
     return messages;
   }

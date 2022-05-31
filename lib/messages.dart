@@ -1,4 +1,5 @@
 import 'package:aplikacja__mobilna/compose.dart';
+import 'package:aplikacja__mobilna/read.dart';
 import 'package:enough_mail/enough_mail.dart';
 import 'package:flutter/material.dart';
 
@@ -45,22 +46,21 @@ class _MessagesPageState extends State<MessagesPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           CircleAvatar(
-            child: Text('$index'),
-          ),
+              child: IconButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute<ReadPage>(
+                            builder: (context) => ReadPage(message: message)));
+                  },
+                  icon: const Icon(Icons.read_more))),
           Padding(
             padding: const EdgeInsets.only(left: 8.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text('Sender: ${message.from}'),
+                Text('From: ${message.from}'),
                 Text('Subject: ${message.decodeSubject()}'),
-                Row(
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8.0)
-                    ),
-                  ],
-                )
               ],
             ),
           ),
