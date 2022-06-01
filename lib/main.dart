@@ -1,4 +1,4 @@
-import 'package:aplikacja__mobilna/connect.dart';
+import 'package:enough_mail/enough_mail.dart';
 import 'package:flutter/material.dart';
 
 import 'messages.dart';
@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: 'Mail App',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -53,16 +53,19 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  bool isLoggingIn = false;
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+    final content = isLoggingIn
+        ? buildInfo(context, "Please wait while we sign you in")
+        : buildLoginForm(context);
 
+    return Scaffold(
+        appBar: AppBar(title: const Text("Mail App")), body: content);
+  }
+
+  Widget buildLoginForm(BuildContext context) {
     final emailField = TextField(
       controller: emailController,
       obscureText: false,
@@ -93,13 +96,7 @@ class _MyHomePageState extends State<MyHomePage> {
         minWidth: MediaQuery.of(context).size.width,
         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
         onPressed: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => ConnectPage(
-                        email: emailController.text,
-                        password: passwordController.text,
-                      )));
+          logIn(context);
         },
         child: Text("Login",
             textAlign: TextAlign.center,
@@ -108,8 +105,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
 
-    return Scaffold(
-        body: SingleChildScrollView(
+    return SingleChildScrollView(
       child: Center(
         child: Container(
           color: Colors.white,
@@ -119,29 +115,63 @@ class _MyHomePageState extends State<MyHomePage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                SizedBox(
-                  height: 100.0,
-                  child: Text("Login panel",
-                      textAlign: TextAlign.center,
-                      style: style.copyWith(
-                          color: Colors.black, fontWeight: FontWeight.bold)),
-                ),
-                SizedBox(height: 45.0),
+                SizedBox(height: 145.0),
                 emailField,
                 SizedBox(height: 25.0),
                 passwordField,
-                SizedBox(
-                  height: 35.0,
-                ),
+                SizedBox(height: 35.0),
                 loginButon,
-                SizedBox(
-                  height: 15.0,
-                ),
+                SizedBox(height: 15.0),
               ],
             ),
           ),
         ),
       ),
-    ));
+    );
+  }
+
+  Widget buildInfo(BuildContext context, String message) {
+    return Center(child: Text(message));
+  }
+
+  void logIn(BuildContext context) {
+    setState(() {
+      isLoggingIn = true;
+    });
+
+    connect().then((client) {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => MessagesPage(client: client))).then((_) {
+        setState(() {
+          isLoggingIn = false;
+        });
+      });
+    }, onError: (_) {
+      setState(() {
+        isLoggingIn = false;
+      });
+    });
+  }
+
+  Future<MailClient> connect() async {
+    final email = emailController.text;
+    final password = passwordController.text;
+
+    // TODO: Show error when login or password is null
+
+    final config = await Discover.discover(email);
+
+    // TODO: Show error when config is null (could not be detected)
+    final account =
+        MailAccount.fromDiscoveredSettings(email, email, password, config!);
+
+    final client = MailClient(account, isLogEnabled: true);
+
+    // TODO: try-catch to handle authorization fail
+    await client.connect();
+
+    return client;
   }
 }

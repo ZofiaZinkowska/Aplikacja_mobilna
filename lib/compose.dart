@@ -1,9 +1,10 @@
-import 'package:aplikacja__mobilna/connect.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:enough_mail/enough_mail.dart';
 import 'package:flutter/material.dart';
 
 class ComposePage extends StatefulWidget {
-  ComposePage({Key? key}) : super(key: key);
+  final MailClient client;
+
+  ComposePage({Key? key, required this.client}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _ComposePageState();
@@ -14,9 +15,23 @@ class _ComposePageState extends State<ComposePage> {
   final emailController = TextEditingController();
   final topicController = TextEditingController();
   final messageController = TextEditingController();
-  
+  bool isSending = false;
+  String? error;
+
   @override
   Widget build(BuildContext context) {
+    Widget body;
+    if (isSending) {
+      body = buildInfo(context, "Please wait while we send your message");
+    } else {
+      body = buildForm(context);
+    }
+
+    return Scaffold(
+        appBar: AppBar(title: const Text("New message")), body: body);
+  }
+
+  Widget buildForm(BuildContext context) {
     final emailField = TextField(
       controller: emailController,
       obscureText: false,
@@ -56,18 +71,18 @@ class _ComposePageState extends State<ComposePage> {
       color: Color(0xff01A0C7),
       child: MaterialButton(
         minWidth: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0), 
+        padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
         onPressed: () {
-          },
-            child: Text("Submit",
-               textAlign: TextAlign.center,
-               style: style.copyWith(
-               color: Colors.white, fontWeight: FontWeight.bold)),
+          send(context);
+        },
+        child: Text("Submit",
+            textAlign: TextAlign.center,
+            style: style.copyWith(
+                color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
 
-    return Scaffold(
-        body: SingleChildScrollView(
+    return SingleChildScrollView(
       child: Center(
         child: Container(
           color: Colors.white,
@@ -83,14 +98,52 @@ class _ComposePageState extends State<ComposePage> {
                 topicField,
                 SizedBox(height: 45.0),
                 messageField,
-                SizedBox(height: 25.0,),
+                SizedBox(height: 25.0),
                 submitButon,
-                SizedBox(height: 25.0,),
+                SizedBox(height: 25.0),
               ],
             ),
           ),
         ),
       ),
-    ));
+    );
+  }
+
+  Widget buildInfo(BuildContext context, String message) {
+    return Center(child: Text(message));
+  }
+
+  void send(BuildContext context) {
+    sendAsync().then((error) {
+      if (error != null) {
+        // TODO: Show error
+      } else {
+        Navigator.pop(context);
+      }
+    });
+  }
+
+  Future<String?> sendAsync() async {
+    setState(() {
+      isSending = true;
+    });
+
+    try {
+      final client = widget.client;
+      final from = client.account.fromAddress;
+      final to = MailAddress(null, emailController.text);
+      final subject = topicController.text;
+      final body = messageController.text;
+
+      // TODO: Validate 'to' and 'body' are not empty
+      final message = MessageBuilder.buildSimpleTextMessage(from, [to], body,
+          subject: subject);
+
+      await client.sendMessage(message);
+
+      return null;
+    } on MailException {
+      return "There was an error sending the message";
+    }
   }
 }
